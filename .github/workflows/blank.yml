@@ -23,8 +23,9 @@ env:
   NODE_VERSION: '10.x'                     # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
+     
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     environment: dev
     steps:
     - name: 'Checkout GitHub Action'
@@ -43,6 +44,16 @@ jobs:
         npm run build --if-present
         npm run test --if-present
         popd
+
+    - name: Merge development -> staging
+      uses: devmasx/merge-branch@master
+      with:
+        type: now
+        from_branch: main
+        target_branch: QA
+        github_token: ${{ secrets.token_github }}
+
+      
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
       id: fa
